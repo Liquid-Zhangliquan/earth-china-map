@@ -98,7 +98,7 @@ export default {
       debugger
       const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
       handler.setInputAction(movement => {
-        const pick = viewer.scene.pick(movement.startPosition);
+        const pick = viewer.scene.pick(movement.endPosition);
         if (Cesium.defined(pick) && pick.id.pickType === 'china') {
           const entity = pick.id;
           const name = entity.properties.name._value;

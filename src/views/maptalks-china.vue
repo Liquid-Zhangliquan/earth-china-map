@@ -1,14 +1,20 @@
 <template>
-  <div id="cesiumContainer"></div>
+  <div class="main">
+    <div id="map"></div>
+  </div>
 </template>
 
 <script>
-
+import * as maptalks from 'maptalks';
+const edgeColor = '#4682B4';
+const polygonColors = ['#C0C0C0', '#058bde'];
+const altitude = 35000;
 export default {
   name: 'maptalks-china',
   data() {
     return {
-
+      polygons: [],
+      limitLines: []
     };
   },
   mounted() {
@@ -16,96 +22,193 @@ export default {
   },
   methods: {
     init() {
-      this.cesiumInit();
-    },
-    cesiumInit() {
-      const viewerOption = {
-        geocoder: false, // 地理位置查询定位控件
-        homeButton: false, // 默认相机位置控件
-        timeline: false, // 时间滚动条控件
-        navigationHelpButton: false, // 默认的相机控制提示控件
-        fullscreenButton: false, // 全屏控件
-        scene3DOnly: true, // 每个几何实例仅以3D渲染以节省GPU内存
-        baseLayerPicker: false, // 底图切换控件
-        animation: false, // 控制场景动画的播放速度控件
-        terrainProvider: new Cesium.createWorldTerrain() // 世界地形
-        // imageryProvider: new Cesium.WebMapTileServiceImageryProvider({
-        //   url:
-        //     "https://t0.tianditu.com/img_w/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=img&tileMatrixSet=w&TileMatrix={TileMatrix}&TileRow={TileRow}&TileCol={TileCol}&style=default&format=tiles&tk=39a4ceb78b2abd7a076551494f1c4fd0",
-        //   layer: "tdtImgBasicLayer",
-        //   style: "default",
-        //   format: "image/jpeg",
-        //   tileMatrixSetID: "GoogleMapsCompatible",
-        //   show: false
+      const map = new maptalks.Map('map', {
+        center: [111.13810910424957, 36.04256912706856],
+        zoom: 5,
+        pitch: 45,
+        bearing: -10.8,
+        attribution: false,
+        doubleClickZoom: false
+        // baseLayer: new maptalks.TileLayer('base', {
+        //   urlTemplate: 'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
+        //   subdomains: ['a', 'b', 'c', 'd'],
+        //   attribution: false
         // })
-        // infoBox : false,
-        // selectionIndicator : false,
-        // shadows : true,
-        // shouldAnimate : true
-      };
-
-      const viewer = new Cesium.Viewer('cesiumContainer', viewerOption);
-      viewer.scene.globe.enableLighting = true;
-      // viewer.scene.globe.depthTestAgainstTerrain = true; // 防止模型漂移
-      viewer._cesiumWidget._creditContainer.style.display = 'none'; // 隐藏版权
-      this.viewer = viewer;
-      window.viewer = viewer;
-
-      this.initCameraEnd();
-      this.initScenePick();
-
-      // 飞行至指定位置
-      viewer.camera.flyTo({
-        destination: Cesium.Cartesian3.fromDegrees(currentView.lon, currentView.lat, currentView.height),
-        orientation: currentView.orientation
       });
-    },
-    initCameraEnd() {
-      this.camera = viewer.camera;
-      viewer.scene.camera.moveEnd.addEventListener(evt => {
-        const camera = this.camera;
-        const heading = camera.heading;
-        const pitch = camera.pitch;
-        const roll = camera.roll;
-        const position = camera.position;
-        const cartographic = Cesium.Cartographic.fromCartesian(position);
-        const longitude = Cesium.Math.toDegrees(cartographic.longitude);
-        const latitude = Cesium.Math.toDegrees(cartographic.latitude);
-        const height = cartographic.height;
-        console.log(longitude + ',' + latitude + ',' + height + ',' + heading + ',' + pitch + ',' + roll);
+      window.MlogMap = map;
+      map.on('zoomend', e => {
+        debugger;
       });
+      this.drawWall('china');
+      this.drawRegion('china');
     },
-    initScenePick() {
-      const me = this;
-      const scene = viewer.scene;
-      const points = [];
-      const points2 = [];
-      const points3 = [];
-      const positions = [];
-      this.sceneEventHandler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
-      this.sceneEventHandler.setInputAction(movement => {
-        const ray = viewer.camera.getPickRay(movement.position);
-        const cartesian = viewer.scene.globe.pick(ray, viewer.scene);
-        const cartographic = Cesium.Cartographic.fromCartesian(cartesian);
-        const lng = Cesium.Math.toDegrees(cartographic.longitude);
-        const lat = Cesium.Math.toDegrees(cartographic.latitude);
-        const height = cartographic.height;
-        const worldPostion = scene.pickPosition(movement.position);
-        const cartographic1 = Cesium.Cartographic.fromCartesian(worldPostion);
-      }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+    drawLimitLines(idx, coordinates, properties) {
+      const outLine = new maptalks.MultiLineString(coordinates, {
+        symbol: {
+          lineColor: edgeColor,
+          lineWidth: 1,
+          textPlacement: 'vertex'
+        },
+        properties: {
+          altitude: altitude,
+          index: idx,
+          id: properties.id,
+          properties: properties
+        }
+      });
+      this.limitLines.push(outLine);
+    },
+    drawBorderLines(coordinates, properties) {
+      let limitLines = [];
+      for (let i = 0; i < 10; i++) {
+        const outLine = new maptalks.MultiLineString(coordinates, {
+          symbol: {
+            lineColor: '#44A8E9',
+            lineWidth: i * 0.2,
+            lineOpacity: i * 0.1,
+            textPlacement: 'vertex'
+          },
+          properties: {
+            altitude: altitude,
+            id: properties.id,
+            properties: properties
+          }
+        });
+        limitLines.push(outLine);
+      }
+      return limitLines;
+    },
+    drawPolygons(idx, coordinates, properties) {
+      const polygon = new maptalks.MultiPolygon(coordinates, {
+        symbol: {
+          lineWidth: 1,
+          lineColor: edgeColor,
+          polygonFill: polygonColors[0],
+          polygonOpacity: 0.5
+        },
+        properties: {
+          altitude: altitude,
+          id: properties.id,
+          index: idx,
+          properties: properties
+        }
+      })
+        .on('mouseenter', function(e) {
+          e.target.updateSymbol({
+            polygonFill: polygonColors[1]
+          });
+        })
+        .on('mouseout', function(e) {
+          e.target.updateSymbol({
+            polygonFill: polygonColors[0]
+          });
+        })
+        .on('click', e => {
+          console.log(e.target);
+        })
+        .on('dblclick', e => {
+          console.log(e.target);
+          const properties = e.target.getProperties().properties;
+          const adcode = properties.adcode;
+          if (adcode === 150000) {
+            this.drawWall('150000');
+            this.drawRegion('150000');
+          }
+        });
+      return polygon;
+    },
+    drawRegion(key) {
+      fetch('../static/data/' + key + '.json', {
+        method: 'GET',
+        mode: 'cors',
+        credentials: 'include'
+      })
+        .then(response => {
+          response.json().then(data => {
+            const features = data.features;
+            let polygons = [];
+            features.forEach((g, i) => {
+              const properties = g.properties;
+              const coordinates = g.geometry.coordinates;
+              const polygon = this.drawPolygons(i, coordinates, properties);
+              polygons.push(polygon);
+            });
+            let layer = MlogMap.getLayer('vector-polygon');
+            if (!layer) {
+              layer = new maptalks.VectorLayer('vector-polygon', {
+                enableAltitude: true
+              }).addTo(MlogMap);
+            }
+            layer.clear();
+            layer.addGeometry(polygons);
+            if (key !== 'china') {
+              const extent = layer.getExtent();
+              const center = extent.getCenter();
+              const zoom = MlogMap.getFitZoom(extent);
+              // MlogMap.setCenterAndZoom(center, zoom);
+              MlogMap.animateTo(
+                {
+                  center: center,
+                  zoom: zoom,
+                  pitch: 60,
+                  bearing: -10.8
+                },
+                {
+                  duration: 3000
+                }
+              );
+            }
+          });
+        })
+        .catch(e => {
+          console.log('error: ' + e.toString());
+        });
+    },
+    drawWall(key) {
+      fetch('../static/data/' + key + '_border.json', {
+        method: 'GET',
+        mode: 'cors',
+        credentials: 'include'
+      })
+        .then(response => {
+          response.json().then(borderMapData => {
+            const borderFeatures = borderMapData.features[0];
+            const properties = borderFeatures.properties;
+            const pathCoordinates = borderFeatures.geometry.coordinates;
+            const limitLines = this.drawBorderLines(pathCoordinates, properties);
+            let layer = MlogMap.getLayer('vector-line');
+            if (!layer) {
+              layer = new maptalks.VectorLayer('vector-line', {
+                enableAltitude: true,
+                drawAltitude: {
+                  polygonFill: '#OB3B5B',
+                  polygonOpacity: 0.6,
+                  lineWidth: 0
+                }
+              }).addTo(MlogMap);
+            }
+            layer.clear();
+            layer.addGeometry(limitLines);
+          });
+        })
+        .catch(e => {
+          console.log('error: ' + e.toString());
+        });
     }
   }
 };
 </script>
 
 <style>
-.pbody {
-  width: 100%;
-  height: 100%;
+.main {
   margin: 0px;
   padding: 0px;
+  width: 100%;
+  height: 100%;
+  background: url('../assets/images/bg.jpg') 50% no-repeat;
+  background-size: cover;
 }
-#cesiumContainer {
+#map {
   margin: 0px;
   padding: 0px;
   width: 100%;
