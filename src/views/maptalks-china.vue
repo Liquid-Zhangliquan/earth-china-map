@@ -37,7 +37,7 @@ export default {
       });
       window.MlogMap = map;
       map.on('zoomend', e => {
-        debugger;
+        
       });
       this.drawWall('china');
       this.drawRegion('china');
@@ -104,10 +104,15 @@ export default {
           });
         })
         .on('click', e => {
-          console.log(e.target);
+          const properties = e.target.getProperties().properties;
+          const name = properties.name;
+          this.$notify({
+            title: '',
+            message: name,
+            position: 'top-left'
+          });
         })
         .on('dblclick', e => {
-          console.log(e.target);
           const properties = e.target.getProperties().properties;
           const adcode = properties.adcode;
           if (adcode === 150000) {
