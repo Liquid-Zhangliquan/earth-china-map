@@ -13,8 +13,7 @@ export default {
   name: 'maptalks-china',
   data() {
     return {
-      polygons: [],
-      limitLines: []
+      mapKey: 'china'
     };
   },
   mounted() {
@@ -37,7 +36,11 @@ export default {
       });
       window.MlogMap = map;
       map.on('zoomend', e => {
-        
+        const zoom = e.target.getZoom();
+        if (zoom < 6 && this.mapKey !== 'china') {
+          this.drawWall('china');
+          this.drawRegion('china');
+        }
       });
       this.drawWall('china');
       this.drawRegion('china');
@@ -60,7 +63,7 @@ export default {
     },
     drawBorderLines(coordinates, properties) {
       let limitLines = [];
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < 1; i++) {// 要素多了会影响 要素polygon 单击事件的响应
         const outLine = new maptalks.MultiLineString(coordinates, {
           symbol: {
             lineColor: '#44A8E9',
@@ -123,6 +126,7 @@ export default {
       return polygon;
     },
     drawRegion(key) {
+      this.mapKey = key;
       fetch('../static/data/' + key + '.json', {
         method: 'GET',
         mode: 'cors',
@@ -170,6 +174,7 @@ export default {
         });
     },
     drawWall(key) {
+       // https://geo.datav.aliyun.com/areas/bound/100000.json
       fetch('../static/data/' + key + '_border.json', {
         method: 'GET',
         mode: 'cors',

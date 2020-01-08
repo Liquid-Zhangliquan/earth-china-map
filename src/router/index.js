@@ -20,6 +20,11 @@ const router =  new Router({
             path: '/maptalks',
             name: 'maptalks-china',
             component: () => import('../views/maptalks-china')
+        },
+        {
+            path: '/maptalks-cesium',
+            name: 'maptalks-cesium',
+            component: () => import('../views/maptalks-cesium')
         }
     ]
 })

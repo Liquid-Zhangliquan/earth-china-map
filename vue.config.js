@@ -40,36 +40,12 @@ module.exports = {
   },
   devServer: {
     proxy: {
-      '/srtm_60_05': {
-        target: 'http://localhost:8082/srtm_60_05',
+      '/areas': {
+        target: 'https://geo.datav.aliyun.com/areas',
         ws: true,
         changeOrigin: true,
         pathRewrite: {
-          '^/srtm_60_05': ''
-        }
-      },
-      '/cva_w': {
-        target: 'http://t0.tianditu.com/cva_w',
-        ws: true,
-        changeOrigin: true,
-        pathRewrite: {
-          '^/cva_w': ''
-        }
-      },
-      '/img_w': {
-        target: 'http://t0.tianditu.com/img_w',
-        ws: true,
-        changeOrigin: true,
-        pathRewrite: {
-          '^/img_w': ''
-        }
-      },
-      '/maps': {
-        target: 'http://www.google.cn/maps',
-        ws: true,
-        changeOrigin: true,
-        pathRewrite: {
-          '^/maps': ''
+          '^/areas': ''
         }
       },
     }
