@@ -1,5 +1,5 @@
 import * as maptalks from 'maptalks';
-import * as Cesium from 'cesium/Cesium';
+// import * as Cesium from 'cesium/Cesium';
 
 const options = {
     sceneOptions : null,

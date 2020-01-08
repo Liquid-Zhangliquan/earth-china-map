@@ -6,10 +6,7 @@
 
 <script>
 import * as maptalks from 'maptalks';
-// import { CesiumLayer } from "./lib/maptalks/maptalks.cesium";
-const edgeColor = '#4682B4';
-const polygonColors = ['#C0C0C0', '#058bde'];
-const altitude = 35000;
+import { CesiumLayer } from '../lib/maptalks/maptalks.cesium';
 export default {
   name: 'maptalks-china',
   data() {
@@ -24,24 +21,31 @@ export default {
   methods: {
     init() {
       const map = new maptalks.Map('map', {
-        center: [111.13810910424957, 36.04256912706856],
-        zoom: 5,
-        pitch: 45,
-        bearing: -10.8,
+        center: [116.96331820577404, 36.256177496939216],
+        zoom: 15,
+        pitch: 64,
+        bearing: -48,
         attribution: false,
-        doubleClickZoom: false
-        // baseLayer: new maptalks.TileLayer('base', {
-        //   urlTemplate: 'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
-        //   subdomains: ['a', 'b', 'c', 'd'],
-        //   attribution: false
-        // })
+        doubleClickZoom: false,
+        baseLayer: new maptalks.TileLayer('googlemap', {
+          style: 'Satellite',
+          urlTemplate: 'http://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}'
+        })
       });
       window.MlogMap = map;
-      map.on('zoomend', e => {
+      map.on('zoomend', e => {});
+      const cesiumLayer = new CesiumLayer("cesium", { gray: false }).addTo(map);
+      //获取cesium scene对象
+      const scene = cesiumLayer.getCesiumScene();
 
-      });
-    },
-    
+      // const maptms = new Cesium.createTileMapServiceImageryProvider({
+      //   url: "maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}"
+      // });
+      scene.imageryLayers.addImageryProvider(maptms);
+
+      // 加载terrain高程数据
+      scene.terrainProvider = new Cesium.createWorldTerrain();
+    }
   }
 };
 </script>
