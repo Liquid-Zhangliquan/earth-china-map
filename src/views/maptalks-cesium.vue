@@ -8,7 +8,7 @@
 import * as maptalks from 'maptalks';
 import { CesiumLayer } from '../lib/maptalks/maptalks.cesium';
 export default {
-  name: 'maptalks-china',
+  name: 'maptalks-cesium',
   data() {
     return {
       polygons: [],
@@ -20,6 +20,7 @@ export default {
   },
   methods: {
     init() {
+      debugger
       const map = new maptalks.Map('map', {
         center: [116.96331820577404, 36.256177496939216],
         zoom: 15,
@@ -37,10 +38,11 @@ export default {
       const cesiumLayer = new CesiumLayer("cesium", { gray: false }).addTo(map);
       //获取cesium scene对象
       const scene = cesiumLayer.getCesiumScene();
+      console.log(Cesium)
 
-      // const maptms = new Cesium.createTileMapServiceImageryProvider({
-      //   url: "maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}"
-      // });
+      const maptms = new Cesium.createTileMapServiceImageryProvider({
+        url: "http://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}"
+      });
       scene.imageryLayers.addImageryProvider(maptms);
 
       // 加载terrain高程数据

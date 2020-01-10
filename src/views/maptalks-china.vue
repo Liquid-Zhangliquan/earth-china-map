@@ -21,9 +21,12 @@ export default {
   },
   methods: {
     init() {
+      
       const map = new maptalks.Map('map', {
         center: [111.13810910424957, 36.04256912706856],
         zoom: 5,
+        minZoom: 4,
+        maxZoom: 9,
         pitch: 45,
         bearing: -10.8,
         attribution: false,
@@ -63,7 +66,8 @@ export default {
     },
     drawBorderLines(coordinates, properties) {
       let limitLines = [];
-      for (let i = 0; i < 1; i++) {// 要素多了会影响 要素polygon 单击事件的响应
+      for (let i = 0; i < 1; i++) {
+        // 要素多了会影响 要素polygon 单击事件的响应
         const outLine = new maptalks.MultiLineString(coordinates, {
           symbol: {
             lineColor: '#44A8E9',
@@ -150,6 +154,16 @@ export default {
             }
             layer.clear();
             layer.addGeometry(polygons);
+            const marker = new maptalks.Marker([111.13810910424957, 36.04256912706856], {
+              symbol: {
+                markerFile: require('../assets/images/fengji.png'),
+                markerWidth: { stops: [[1, 6],[5, 30], [12, 30]] },
+                markerHeight: { stops: [[1, 10],[5, 50], [12,50]] },
+              },
+              properties: {
+                altitude: 40000
+              }
+            }).addTo(layer);
             if (key !== 'china') {
               const extent = layer.getExtent();
               const center = extent.getCenter();
@@ -174,7 +188,7 @@ export default {
         });
     },
     drawWall(key) {
-       // https://geo.datav.aliyun.com/areas/bound/100000.json
+      // https://geo.datav.aliyun.com/areas/bound/100000.json
       fetch('../static/data/' + key + '_border.json', {
         method: 'GET',
         mode: 'cors',

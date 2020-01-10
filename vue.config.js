@@ -6,6 +6,7 @@ const webpack = require('webpack')
 // let cesiumWorkers = '../Build/Cesium/Workers'
 
 const cesiumBuild = './node_modules/cesium/Build/Cesium';
+const threeBuild = './node_modules/three/Build';
 
 module.exports = {
   publicPath: '',
@@ -29,6 +30,7 @@ module.exports = {
     // },
     plugins: [
       new CopyWebpackPlugin([{from: path.join(__dirname, cesiumBuild), to: 'Cesium'}]),
+      new CopyWebpackPlugin([{from: path.join(__dirname, threeBuild), to: 'Three'}]),
       // new CopyWebpackPlugin([{ from: path.join(cesiumSource, cesiumWorkers), to: 'Workers' }]),
       // new CopyWebpackPlugin([{ from: path.join(cesiumSource, 'Assets'), to: 'Assets' }]),
       // new CopyWebpackPlugin([{ from: path.join(cesiumSource, 'Widgets'), to: 'Widgets' }]),

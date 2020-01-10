@@ -22,7 +22,12 @@ const router =  new Router({
             component: () => import('../views/maptalks-china')
         },
         {
-            path: '/maptalks-cesium',
+            path: '/three',
+            name: 'maptalks-three',
+            component: () => import('../views/maptalks-three')
+        },
+        {
+            path: '/demo',
             name: 'maptalks-cesium',
             component: () => import('../views/maptalks-cesium')
         }
