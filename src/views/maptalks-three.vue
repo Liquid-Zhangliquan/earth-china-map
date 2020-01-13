@@ -7,6 +7,7 @@
 <script>
 import * as maptalks from 'maptalks';
 // import * as THREE from 'three';
+import GLTFLoader from 'three-gltf-loader';
 import { ThreeLayer } from 'maptalks.three';
 export default {
   name: 'maptalks-three',
@@ -49,12 +50,15 @@ export default {
         let loader = new THREE.GLTFLoader(); /*实例化加载器*/
 
         loader.load(
-          'http://localhost:8080/staric/data/fj.gltf',
+          './static/data/fj.gltf',
           function(obj) {
             console.log(obj);
-            obj.scene.position.y = 1;
+            const v = threeLayer.coordinateToVector3(new maptalks.Coordinate(116.96331820577404, 36.256177496939216));
+            obj.scene.position.x = v.x;
+            obj.scene.position.y = v.y;
+            obj.scene.position.z = 0;
             scene.add(obj.scene);
-            document.getElementById('loading').style.display = 'none';
+            threeLayer.renderScene();
           },
           function(xhr) {
             console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
