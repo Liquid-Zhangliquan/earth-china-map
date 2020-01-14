@@ -7,7 +7,7 @@
 <script>
 import * as maptalks from 'maptalks';
 // import * as THREE from 'three';
-import GLTFLoader from 'three-gltf-loader';
+// import GLTFLoader from 'three-gltf-loader';
 import { ThreeLayer } from 'maptalks.three';
 export default {
   name: 'maptalks-three',
@@ -44,19 +44,22 @@ export default {
         opacity: 0.6
       }).addTo(map);
       threeLayer.prepareToDraw = function(gl, scene, camera) {
-        const light = new THREE.DirectionalLight(new THREE.Color('rgb(255, 255, 255)'));
-        light.position.set(-1, 0, 1);
+        // const light = new THREE.DirectionalLight(new THREE.Color('rgb(255, 255, 255)'));
+        // light.position.set(-1, 0, 1);
+        gl.setPixelRatio(window.devicePixelRatio);
+        scene.add(new THREE.AmbientLight(0xffffff));// soft white light
         // 加载 glTF 格式的模型
         let loader = new THREE.GLTFLoader(); /*实例化加载器*/
 
         loader.load(
-          './static/data/fj.gltf',
+          './static/data/dxg.glb',
           function(obj) {
             console.log(obj);
             const v = threeLayer.coordinateToVector3(new maptalks.Coordinate(116.96331820577404, 36.256177496939216));
             obj.scene.position.x = v.x;
             obj.scene.position.y = v.y;
             obj.scene.position.z = 0;
+            obj.scene.rotateX(Math.PI / 2.);
             scene.add(obj.scene);
             threeLayer.renderScene();
           },
